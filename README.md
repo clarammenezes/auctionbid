@@ -39,7 +39,7 @@
     - Store user data, auction listings, bids, and notifications. 
     - Use MongoDB Atlas for cloud-based storage and MongoDB Compass for data visualization.
 5. **UML:**
-
+![diagram (1)](https://github.com/user-attachments/assets/a53dda08-be3b-4bc0-86e8-cb25c203cf7a)
 
 
 
