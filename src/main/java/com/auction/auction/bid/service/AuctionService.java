@@ -1,5 +1,6 @@
 package com.auction.auction.bid.service;
 
+import com.auction.auction.bid.exception.AuctionNotFoundException;
 import com.auction.auction.bid.model.Auction;
 import com.auction.auction.bid.repository.AuctionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class AuctionService {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    public Auction saveOrUpdateAuction(Auction auction) {
+    public Auction saveOrUpdateAuction(Auction auction){
         return auctionRepository.save(auction);
     }
 
@@ -29,7 +30,13 @@ public class AuctionService {
     }
 
     public Auction getAuctionById(String id) {
-        return auctionRepository.findById(id).get();
+        //return auctionRepository.findById(id).get();
+        if(auctionRepository.existsById(id)) {
+            return auctionRepository.findById(id).get();
+        }
+        else {
+            throw new AuctionNotFoundException(id);
+        }
     }
 
     public Auction getAuctionByDescription(String description) {
@@ -61,7 +68,11 @@ public class AuctionService {
     }
 
     public void deleteAuctionById(String id) {
-        auctionRepository.deleteById(id);
+        if(auctionRepository.existsById(id)) {
+            auctionRepository.deleteById(id);
+        } else {
+            throw new AuctionNotFoundException(id);
+        }
     }
 
     public List<Auction> getAuctionsByTitle(String title) {

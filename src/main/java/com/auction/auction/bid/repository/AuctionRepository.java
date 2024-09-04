@@ -10,7 +10,6 @@ public interface AuctionRepository extends MongoRepository<Auction, String> {
     List<Auction> findByTitle(String title);
     List<Auction> findBySeller(String seller);
     List<Auction> findByStartingBid(double startingBid);
-    Optional<Auction> findById(String id);
     List<Auction> findByCurrentBidGreaterThan(double currentBid);
     List<Auction> findByCurrentBidLessThan(double currentBid);
     List<Auction> findByCurrentBidBetween(double min, double max);

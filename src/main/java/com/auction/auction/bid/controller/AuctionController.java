@@ -3,6 +3,7 @@ package com.auction.auction.bid.controller;
 import com.auction.auction.bid.model.Auction;
 import com.auction.auction.bid.service.AuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,17 @@ public class AuctionController {
         auctionService.sendMessage(message);
     }
 
+    @DeleteMapping(value = "/deleteAll")
+    public ResponseEntity<?> deleteAllAuctions() {
+        auctionService.deleteAllAuctions();
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value="accounts/{id}")
+    public Auction getAuctionById(@PathVariable String id) {
+        return auctionService.getAuctionById(id);
+    }
+
 //    @PostMapping
 //    public Auction saveOrUpdateAuction(@RequestBody Auction auction){
 //        return auctionService.saveOrUpdateAuction(auction);
@@ -33,20 +45,31 @@ public class AuctionController {
         return auctionService.getAllAuctions();
     }
 
-//    @GetMapping
-//    public List<Auction> getAuctionsByTitle(@RequestParam String title) {
+//    @GetMapping(value="auction/{title}")
+//    public List<Auction> getAuctionsByTitle(@PathVariable String title) {
 //        return auctionService.getAuctionsByTitle(title);
 //    }
 //
-//    @GetMapping
-//    public List<Auction> getAuctionsBySeller(@RequestParam String seller) {
+//    @GetMapping(value="auction/{seller}")
+//    public List<Auction> getAuctionsBySeller(@PathVariable String seller) {
 //        return auctionService.getAuctionsBySeller(seller);
 //    }
 //
-//    @GetMapping
-//    public Auction getAuctionsByStartingBid(@RequestParam double startingBid) {
+//
+//    @GetMapping(value="auction/{startingBid}")
+//    public Auction getAuctionsByStartingBid(@PathVariable double startingBid) {
 //        return auctionService.getAuctionsByStartingBid(startingBid);
 //    }
+//
 
-
+//
+//    @GetMapping(value="auction/{description}")
+//    public Auction getAuctionByDescription(@PathVariable String description) {
+//        return auctionService.getAuctionByDescription(description);
+//    }
+//
+//    @GetMapping(value="auction/{currentBid}")
+//    public List<Auction> getAuctionByCurrent(@PathVariable double currentBid) {
+//        return auctionService.getAuctionByCurrentBid(currentBid);
+//    }
 }

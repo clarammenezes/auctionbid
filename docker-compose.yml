@@ -1,0 +1,11 @@
+services:
+  auctionplatform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: auctionbid:latest
+    container_name: auctionbid
+    ports:
+      - '8080:8080'
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:oSseb5Z2inYssZv0@mongodb:27017/auctiondb
