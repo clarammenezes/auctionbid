@@ -1,6 +1,7 @@
 package com.auction.auction.bid.controller;
 
 import com.auction.auction.bid.model.Auction;
+import com.auction.auction.bid.model.Bid;
 import com.auction.auction.bid.service.AuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,31 +15,36 @@ public class AuctionController {
     @Autowired
     private AuctionService auctionService;
 
-    @PostMapping
-    public Auction createAuction(@RequestBody Auction auction) {
-        return auctionService.createAuction(auction);
-    }
+//    @PostMapping
+//    public Auction createAuction(@RequestBody Auction auction) {
+//        return auctionService.createAuction(auction);
+//    }
 
     @PostMapping(value = "/sendMessage", consumes = "text/plain")
     public void sendMessage(@RequestBody String message) {
         auctionService.sendMessage(message);
     }
 
-    @DeleteMapping(value = "/deleteAll")
-    public ResponseEntity<?> deleteAllAuctions() {
-        auctionService.deleteAllAuctions();
-        return ResponseEntity.ok().build();
-    }
+//    @DeleteMapping(value = "/deleteAll")
+//    public ResponseEntity<?> deleteAllAuctions() {
+//        auctionService.deleteAllAuctions();
+//        return ResponseEntity.ok().build();
+//    }
 
     @GetMapping(value="accounts/{id}")
     public Auction getAuctionById(@PathVariable String id) {
         return auctionService.getAuctionById(id);
     }
 
-//    @PostMapping
-//    public Auction saveOrUpdateAuction(@RequestBody Auction auction){
-//        return auctionService.saveOrUpdateAuction(auction);
-//    }
+    @PostMapping
+    public Auction saveOrUpdateAuction(@RequestBody Auction auction){
+        return auctionService.saveOrUpdateAuction(auction);
+    }
+
+    @PostMapping("/{auctionId}/bid")
+    public Auction placeBid(@PathVariable String auctionId, @RequestBody Bid bid) {
+        return auctionService.placeBid(auctionId, bid);
+    }
 
     @GetMapping
     public List<Auction> getAllAuctions() {

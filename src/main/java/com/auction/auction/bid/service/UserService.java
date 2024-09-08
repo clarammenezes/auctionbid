@@ -21,7 +21,7 @@ public class UserService {
     }
 
     public User getUserById(String id) {
-        return userRepository.findById(id);
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(String.format("User with id %s not found", id)));
     }
 
     public List<User> getAllUsers() {

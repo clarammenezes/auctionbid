@@ -1,11 +1,37 @@
 services:
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+#    command: >
+#      "
+#      ./opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic auction-created &&
+#      ./opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 -create --topic bid-placed &&
+#      ./opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic auctions
+#      "
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
   auctionplatform:
     build:
       context: .
       dockerfile: Dockerfile
-    image: auctionbid:latest
+    image: auctionbid:7
     container_name: auctionbid
+    depends_on:
+        - kafka
     ports:
       - '8080:8080'
+      - '27017:27017'
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://root:oSseb5Z2inYssZv0@mongodb:27017/auctiondb
+      SPRING_DATA_MONGODB_URI: mongodb+srv://clarammenezes:X57hTlYEA2lFhIul@general-cluster.rfftb.mongodb.net/auctiondb
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092

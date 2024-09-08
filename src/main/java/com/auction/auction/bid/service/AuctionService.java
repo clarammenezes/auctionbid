@@ -1,50 +1,70 @@
 package com.auction.auction.bid.service;
 
 import com.auction.auction.bid.exception.AuctionNotFoundException;
+import com.auction.auction.bid.kafka.KafkaProducerService;
 import com.auction.auction.bid.model.Auction;
+import com.auction.auction.bid.model.Bid;
 import com.auction.auction.bid.repository.AuctionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class AuctionService {
+
     @Autowired
     private AuctionRepository auctionRepository;
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaProducerService kafkaProducerService;
 
-    public Auction saveOrUpdateAuction(Auction auction){
-        return auctionRepository.save(auction);
-    }
+    @Autowired
+    private BidService bidService;
 
-    public Auction createAuction(Auction auction){
-        return auctionRepository.save(auction);
-    }
 
-    public void deleteAllAuctions() {
-        auctionRepository.deleteAll();
-    }
+    public Auction placeBid(String auctionId, Bid bid) {
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new AuctionNotFoundException(auctionId));
+        if (bid.getAmount() > auction.getCurrentBid()) {
+            bidService.saveBid(bid);
+            auction.getBids().add(bid);
+            auction.setCurrentBid(bid.getAmount());
+            auctionRepository.save(auction);
+            kafkaProducerService.sendMessage("auction-notifications",
+                    "New bid placed on auction: " + auction.getTitle() + " by " + bid.getBidder());
 
-    public Auction getAuctionById(String id) {
-        //return auctionRepository.findById(id).get();
-        if(auctionRepository.existsById(id)) {
-            return auctionRepository.findById(id).get();
+            return auction;
+        } else {
+            throw new IllegalArgumentException("The bid amount must be higher than the current bid.");
         }
-        else {
+    }
+
+
+    public Auction saveOrUpdateAuction(Auction auction) {
+        Auction savedAuction = auctionRepository.save(auction);
+        kafkaProducerService.sendMessage("auction-notifications", "Auction created or updated: " + savedAuction.getTitle());
+        return savedAuction;
+    }
+
+    public void deleteAuctionById(String id) {
+        if (auctionRepository.existsById(id)) {
+            auctionRepository.deleteById(id);
+            kafkaProducerService.sendMessage("auction-notifications", "Auction deleted with id: " + id);
+        } else {
             throw new AuctionNotFoundException(id);
         }
     }
 
-    public Auction getAuctionByDescription(String description) {
-        return auctionRepository.findByDescription(description).get(0);
+    public Auction getAuctionById(String id) {
+        return auctionRepository.findById(id)
+                .orElseThrow(() -> new AuctionNotFoundException(id));
     }
 
-    public Auction getAuctionsByStartingBid(double startingBid) {
-        return auctionRepository.findByStartingBid(startingBid).get(0);
+    public Auction getAuctionByDescription(String description) {
+        return auctionRepository.findByDescription(description)
+                .stream().findFirst()
+                .orElseThrow(() -> new AuctionNotFoundException("Auction with description " + description + " not found"));
     }
 
     public List<Auction> getAuctionByCurrentBidGreaterThan(double currentBid) {
@@ -57,22 +77,6 @@ public class AuctionService {
 
     public List<Auction> getAuctionByCurrentBidBetween(double min, double max) {
         return auctionRepository.findByCurrentBidBetween(min, max);
-    }
-
-    public List<Auction> getAuctionByTitleAndCurrentBidGreaterThan(String title, double currentBid) {
-        return auctionRepository.findByTitleAndCurrentBidGreaterThan(title, currentBid);
-    }
-
-    public List<Auction> getAuctionByTitleAndCurrentBidLessThan(String title, double currentBid) {
-        return auctionRepository.findByTitleAndCurrentBidLessThan(title, currentBid);
-    }
-
-    public void deleteAuctionById(String id) {
-        if(auctionRepository.existsById(id)) {
-            auctionRepository.deleteById(id);
-        } else {
-            throw new AuctionNotFoundException(id);
-        }
     }
 
     public List<Auction> getAuctionsByTitle(String title) {
@@ -92,8 +96,6 @@ public class AuctionService {
     }
 
     public void sendMessage(String message) {
-        this.kafkaTemplate.send("auctions", message);
+        this.kafkaProducerService.sendMessage("auctions", message);
     }
-
-
 }

@@ -5,7 +5,7 @@ spring:
     mongodb:
         uri: ${SPRING_DATA_MONGODB_URI}
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     properties:
       security:
         protocol: PLAINTEXT
