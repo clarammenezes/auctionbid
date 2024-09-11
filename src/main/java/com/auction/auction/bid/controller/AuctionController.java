@@ -15,10 +15,10 @@ public class AuctionController {
     @Autowired
     private AuctionService auctionService;
 
-//    @PostMapping
-//    public Auction createAuction(@RequestBody Auction auction) {
-//        return auctionService.createAuction(auction);
-//    }
+    @PostMapping
+    public Auction createAuction(@RequestBody Auction auction) {
+        return auctionService.createAuction(auction);
+    }
 
     @PostMapping(value = "/sendMessage", consumes = "text/plain")
     public void sendMessage(@RequestBody String message) {

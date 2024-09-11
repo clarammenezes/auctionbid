@@ -23,6 +23,13 @@ public class AuctionService {
     @Autowired
     private BidService bidService;
 
+    // create auction
+    public Auction createAuction(Auction auction) {
+        Auction savedAuction = auctionRepository.save(auction);
+        kafkaProducerService.sendMessage("auction-notifications", "Auction created: " + savedAuction.getTitle());
+        return savedAuction;
+    }
+
     //place bid on auction
     public Auction placeBid(String auctionId, Bid bid) {
         Auction auction = auctionRepository.findById(auctionId)
@@ -41,6 +48,7 @@ public class AuctionService {
         }
     }
 
+    // close auction
     public void closeAuction(String auctionId) {
         Auction auction = getAuctionById(auctionId);
 
