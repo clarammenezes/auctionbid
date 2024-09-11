@@ -25,6 +25,12 @@ public class AuctionController {
         auctionService.sendMessage(message);
     }
 
+    @PostMapping("/{auctionId}/close")
+    public ResponseEntity<String> closeAuction(@PathVariable String auctionId){
+        auctionService.closeAuction(auctionId);
+        return ResponseEntity.ok("Auction closed successfully");
+    }
+
 //    @DeleteMapping(value = "/deleteAll")
 //    public ResponseEntity<?> deleteAllAuctions() {
 //        auctionService.deleteAllAuctions();

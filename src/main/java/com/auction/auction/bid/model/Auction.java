@@ -19,6 +19,7 @@ public class Auction {
     private double startingBid;
     private double currentBid;
     private List<Bid> bids;
+    private boolean isClosed;
 
     public Auction(String id, String title, String description, String seller, double startingBid, double currentBid, List<Bid> bids) {
         this.id = id;
@@ -28,5 +29,9 @@ public class Auction {
         this.startingBid = startingBid;
         this.currentBid = currentBid;
         this.bids = bids;
+    }
+
+    public void setClosed(boolean closed) {
+        isClosed = closed;
     }
 }

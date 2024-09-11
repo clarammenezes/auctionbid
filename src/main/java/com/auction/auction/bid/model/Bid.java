@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Bid {
     @Id
     private String id;
-    private String auctionId;
+    private String auctionId; //username
     private String bidder;
     private double amount;
 

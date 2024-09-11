@@ -8,6 +8,7 @@ import com.auction.auction.bid.repository.AuctionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -22,12 +23,12 @@ public class AuctionService {
     @Autowired
     private BidService bidService;
 
-
+    //place bid on auction
     public Auction placeBid(String auctionId, Bid bid) {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
         if (bid.getAmount() > auction.getCurrentBid()) {
-            bidService.saveBid(bid);
+            bidService.saveBid(auctionId,bid);
             auction.getBids().add(bid);
             auction.setCurrentBid(bid.getAmount());
             auctionRepository.save(auction);
@@ -38,6 +39,30 @@ public class AuctionService {
         } else {
             throw new IllegalArgumentException("The bid amount must be higher than the current bid.");
         }
+    }
+
+    public void closeAuction(String auctionId) {
+        Auction auction = getAuctionById(auctionId);
+
+        // verification
+        List<Bid> bids = auction.getBids();
+        if (bids.isEmpty()) {
+            throw new AuctionNotFoundException("No bids found for this auction.");
+        }
+
+        Bid winningBid = bids.stream()
+                .max(Comparator.comparingDouble(Bid::getAmount))
+                .orElseThrow(() -> new AuctionNotFoundException("No valid bids found."));
+
+        // notify winner
+        String message = String.format("Congratulations %s, you won the auction %s with a bid of %.2f",
+                winningBid.getBidder(),
+                auction.getTitle(),
+                winningBid.getAmount());
+        kafkaProducerService.sendMessage("auction-notifications", message);
+
+        auction.setClosed(true);
+        auctionRepository.save(auction);
     }
 
 

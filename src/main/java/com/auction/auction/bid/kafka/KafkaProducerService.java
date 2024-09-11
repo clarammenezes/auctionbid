@@ -1,4 +1,4 @@
-package com.auction.auction.bid.kafka; // Verifique se o pacote está correto
+package com.auction.auction.bid.kafka;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
