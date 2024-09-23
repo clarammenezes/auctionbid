@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -31,11 +32,16 @@ public class AuctionController {
         return ResponseEntity.ok("Auction closed successfully");
     }
 
-//    @DeleteMapping(value = "/deleteAll")
-//    public ResponseEntity<?> deleteAllAuctions() {
-//        auctionService.deleteAllAuctions();
-//        return ResponseEntity.ok().build();
-//    }
+    @GetMapping("/startingAt")
+    public List<Auction> getAuctionsStartingAt(@RequestParam Date date) {
+        return auctionService.getAuctionsStartingAt(date);
+    }
+
+    @DeleteMapping(value = "/deleteAll")
+    public ResponseEntity<?> deleteAllAuctions() {
+        auctionService.deleteAllAuctions();
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping(value="accounts/{id}")
     public Auction getAuctionById(@PathVariable String id) {
@@ -57,31 +63,29 @@ public class AuctionController {
         return auctionService.getAllAuctions();
     }
 
-//    @GetMapping(value="auction/{title}")
-//    public List<Auction> getAuctionsByTitle(@PathVariable String title) {
-//        return auctionService.getAuctionsByTitle(title);
-//    }
-//
-//    @GetMapping(value="auction/{seller}")
-//    public List<Auction> getAuctionsBySeller(@PathVariable String seller) {
-//        return auctionService.getAuctionsBySeller(seller);
-//    }
-//
-//
-//    @GetMapping(value="auction/{startingBid}")
-//    public Auction getAuctionsByStartingBid(@PathVariable double startingBid) {
-//        return auctionService.getAuctionsByStartingBid(startingBid);
-//    }
-//
+    @GetMapping(value="auction/{title}")
+    public List<Auction> getAuctionsByTitle(@PathVariable String title) {
+        return auctionService.getAuctionsByTitle(title);
+    }
 
-//
-//    @GetMapping(value="auction/{description}")
-//    public Auction getAuctionByDescription(@PathVariable String description) {
-//        return auctionService.getAuctionByDescription(description);
-//    }
-//
-//    @GetMapping(value="auction/{currentBid}")
-//    public List<Auction> getAuctionByCurrent(@PathVariable double currentBid) {
-//        return auctionService.getAuctionByCurrentBid(currentBid);
-//    }
+    @GetMapping(value="auction/{seller}")
+    public List<Auction> getAuctionsBySeller(@PathVariable String seller) {
+        return auctionService.getAuctionsBySeller(seller);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteAuctionById(@PathVariable String id) {
+        auctionService.deleteAuctionById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value="auction/{description}")
+    public Auction getAuctionByDescription(@PathVariable String description) {
+        return auctionService.getAuctionByDescription(description);
+    }
+
+    @GetMapping(value="auction/{currentBid}")
+    public Auction getAuctionByCurrent(@PathVariable double currentBid) {
+        return auctionService.getAuctionByCurrentBid(currentBid);
+    }
 }

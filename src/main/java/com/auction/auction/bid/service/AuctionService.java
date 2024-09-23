@@ -8,7 +8,9 @@ import com.auction.auction.bid.repository.AuctionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -30,7 +32,23 @@ public class AuctionService {
         return savedAuction;
     }
 
-    //place bid on auction
+    public List<Auction> getAuctionsStartingAt(Date specificDate) {
+        // create a date range for the specific date and hour
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(specificDate);
+
+        // set the start of the hour (e.g., 2023-10-15 10:00:00)
+        Date startOfHour = calendar.getTime();
+
+        // set the end of the hour (e.g., 2023-10-15 10:59:59)
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
+        Date endOfHour = calendar.getTime();
+
+        // call the repository method to find auctions
+        return auctionRepository.findAuctionsStartingAt(startOfHour, endOfHour);
+    }
+
+    // place bid on auction
     public Auction placeBid(String auctionId, Bid bid) {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
@@ -76,7 +94,7 @@ public class AuctionService {
 
     public Auction saveOrUpdateAuction(Auction auction) {
         Auction savedAuction = auctionRepository.save(auction);
-        kafkaProducerService.sendMessage("auction-notifications", "Auction created or updated: " + savedAuction.getTitle());
+        kafkaProducerService.sendMessage("auction-notifications", "Auction updated: " + savedAuction.getTitle());
         return savedAuction;
     }
 
@@ -89,9 +107,21 @@ public class AuctionService {
         }
     }
 
+    public Auction getAuctionByCurrentBid(double currentBid) {
+        return auctionRepository.findByCurrentBid(currentBid)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new AuctionNotFoundException("Auction with current bid " + currentBid + " not found"));
+    }
+
     public Auction getAuctionById(String id) {
         return auctionRepository.findById(id)
                 .orElseThrow(() -> new AuctionNotFoundException(id));
+    }
+
+    public void deleteAllAuctions() {
+        auctionRepository.deleteAll();
+        kafkaProducerService.sendMessage("auction-notifications", "All auctions have been deleted.");
     }
 
     public Auction getAuctionByDescription(String description) {
@@ -128,6 +158,7 @@ public class AuctionService {
         return auctionRepository.findByTitleAndCurrentBidBetween(title, minBid, maxBid);
     }
 
+    // testing kafka producer
     public void sendMessage(String message) {
         this.kafkaProducerService.sendMessage("auctions", message);
     }

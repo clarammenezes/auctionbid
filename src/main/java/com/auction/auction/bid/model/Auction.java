@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 import java.util.List;
 
 @Setter
@@ -20,8 +21,10 @@ public class Auction {
     private double currentBid;
     private List<Bid> bids;
     private boolean isClosed;
+    private Date startDate;
+    private Date endDate;
 
-    public Auction(String id, String title, String description, String seller, double startingBid, double currentBid, List<Bid> bids) {
+    public Auction(String id, String title, String description, String seller, double startingBid, double currentBid, List<Bid> bids, Date startDate, Date endDate) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -29,6 +32,8 @@ public class Auction {
         this.startingBid = startingBid;
         this.currentBid = currentBid;
         this.bids = bids;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     public void setClosed(boolean closed) {
