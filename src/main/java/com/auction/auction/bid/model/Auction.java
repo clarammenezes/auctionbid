@@ -16,7 +16,7 @@ public class Auction {
     private String id;
     private String title;
     private String description;
-    private String seller;
+    private String owner;
     private double startingBid;
     private double currentBid;
     private List<Bid> bids;
@@ -24,11 +24,11 @@ public class Auction {
     private Date startDate;
     private Date endDate;
 
-    public Auction(String id, String title, String description, String seller, double startingBid, double currentBid, List<Bid> bids, Date startDate, Date endDate) {
+    public Auction(String id, String title, String description, String owner, double startingBid, double currentBid, List<Bid> bids, Date startDate, Date endDate) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.seller = seller;
+        this.owner = owner;
         this.startingBid = startingBid;
         this.currentBid = currentBid;
         this.bids = bids;

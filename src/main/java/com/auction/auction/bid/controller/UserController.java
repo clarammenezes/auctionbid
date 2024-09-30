@@ -1,6 +1,7 @@
 package com.auction.auction.bid.controller;
 
 import com.auction.auction.bid.dto.UserDTO;
+import com.auction.auction.bid.interfaces.UserInterface;
 import com.auction.auction.bid.model.User;
 import com.auction.auction.bid.service.UserService;
 import jakarta.validation.Valid;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -16,37 +16,31 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private final UserService userService;
+    private UserInterface userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @PostMapping("/users")
     public ResponseEntity<User> createUser(@RequestBody @Valid UserDTO userDTO) {
-        User user = new User(
-                userDTO.getUsername(),
-                userDTO.getPassword(),
-                userDTO.getEmail()
-        );
-        User createdUser = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        User response = userService.createUser(userDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/saveOrUpdate")
-    public ResponseEntity<User> saveOrUpdateUser(@RequestBody User user) {
-        User savedUser = userService.saveOrUpdateUser(user);
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User user) {
+        User updatedUser = userService.updateUser(id, user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<User> saveUser(@RequestBody User user) {
+        User savedUser = userService.saveUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable String id) {
         User user = userService.getUserById(id);
-        if (user != null) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping
@@ -65,20 +59,10 @@ public class UserController {
         }
     }
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        User user = (User) userService.getUserByEmail(email);
-        if (user != null) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable String id) {
-        userService.deleteUserById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<String> deleteUserById(@PathVariable String id) {
+        String message = userService.deleteUserById(id);
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
 }

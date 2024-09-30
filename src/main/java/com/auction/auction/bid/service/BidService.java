@@ -1,5 +1,6 @@
 package com.auction.auction.bid.service;
 
+import com.auction.auction.bid.interfaces.BidInterface;
 import com.auction.auction.bid.kafka.KafkaProducerService;
 import com.auction.auction.bid.model.Auction;
 import com.auction.auction.bid.model.Bid;
@@ -11,7 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class BidService {
+public class BidService implements BidInterface {
     @Autowired
     private BidRepository bidRepository;
 
@@ -21,17 +22,19 @@ public class BidService {
     @Autowired
     private KafkaProducerService kafkaProducerService;
 
+    @Override
     public Bid saveBid(String auctionId, Bid bid) {
         Auction auction = auctionService.getAuctionById(auctionId);
 
         auction.getBids().add(bid);
-        auctionService.saveOrUpdateAuction(auction);
+        auctionService.saveAuction(auction);
 
         kafkaProducerService.sendMessage("bid-notifications", "New bid placed on auction: " + auction.getTitle());
 
         return bidRepository.save(bid);
     }
 
+    @Override
     //place bid on auction
     public Bid placeBid(String auctionId, Bid bid) {
         Auction auction = auctionService.getAuctionById(auctionId);
@@ -53,7 +56,7 @@ public class BidService {
 
         // new bid to auction
         auction.getBids().add(bid);
-        auctionService.saveOrUpdateAuction(auction);
+        auctionService.saveAuction(auction);
 
         // new bid placed notification
         String newBidMessage = String.format("New bid placed on auction %s by %s: %.2f",

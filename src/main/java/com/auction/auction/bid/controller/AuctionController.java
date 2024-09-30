@@ -1,8 +1,8 @@
 package com.auction.auction.bid.controller;
 
+import com.auction.auction.bid.interfaces.AuctionInterface;
 import com.auction.auction.bid.model.Auction;
 import com.auction.auction.bid.model.Bid;
-import com.auction.auction.bid.service.AuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,17 +13,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/auctions")
 public class AuctionController {
+
     @Autowired
-    private AuctionService auctionService;
+    private AuctionInterface auctionService;
 
     @PostMapping
     public Auction createAuction(@RequestBody Auction auction) {
         return auctionService.createAuction(auction);
-    }
-
-    @PostMapping(value = "/sendMessage", consumes = "text/plain")
-    public void sendMessage(@RequestBody String message) {
-        auctionService.sendMessage(message);
     }
 
     @PostMapping("/{auctionId}/close")
@@ -37,20 +33,10 @@ public class AuctionController {
         return auctionService.getAuctionsStartingAt(date);
     }
 
-    @DeleteMapping(value = "/deleteAll")
-    public ResponseEntity<?> deleteAllAuctions() {
-        auctionService.deleteAllAuctions();
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping(value="accounts/{id}")
-    public Auction getAuctionById(@PathVariable String id) {
-        return auctionService.getAuctionById(id);
-    }
-
     @PostMapping
-    public Auction saveOrUpdateAuction(@RequestBody Auction auction){
-        return auctionService.saveOrUpdateAuction(auction);
+    public ResponseEntity<String> saveAuction(@RequestBody Auction auction) {
+        auctionService.saveAuction(auction);
+        return ResponseEntity.ok("Auction saved successfully");
     }
 
     @PostMapping("/{auctionId}/bid")
@@ -63,29 +49,16 @@ public class AuctionController {
         return auctionService.getAllAuctions();
     }
 
-    @GetMapping(value="auction/{title}")
-    public List<Auction> getAuctionsByTitle(@PathVariable String title) {
-        return auctionService.getAuctionsByTitle(title);
-    }
 
-    @GetMapping(value="auction/{seller}")
-    public List<Auction> getAuctionsBySeller(@PathVariable String seller) {
-        return auctionService.getAuctionsBySeller(seller);
+    @GetMapping(value="auction/{owner}")
+    public List<Auction> getAuctionsByOwner(@PathVariable String owner) {
+        return auctionService.getAuctionsByOwner(owner);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAuctionById(@PathVariable String id) {
         auctionService.deleteAuctionById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Auction deleted successfully");
     }
 
-    @GetMapping(value="auction/{description}")
-    public Auction getAuctionByDescription(@PathVariable String description) {
-        return auctionService.getAuctionByDescription(description);
-    }
-
-    @GetMapping(value="auction/{currentBid}")
-    public Auction getAuctionByCurrent(@PathVariable double currentBid) {
-        return auctionService.getAuctionByCurrentBid(currentBid);
-    }
 }
