@@ -35,7 +35,6 @@ public class UserService implements UserInterface {
         user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
-        // set other fields as necessary
         return saveUser(user);
     }
 
