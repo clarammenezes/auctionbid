@@ -1,6 +1,6 @@
 package com.auction.auction.bid.service;
 
-import com.auction.auction.bid.interfaces.BidInterface;
+import com.auction.auction.bid.interfaces.BidIServiceI;
 import com.auction.auction.bid.kafka.KafkaProducerService;
 import com.auction.auction.bid.model.Auction;
 import com.auction.auction.bid.model.Bid;
@@ -12,7 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class BidService implements BidInterface {
+public class BidService implements BidIServiceI {
     @Autowired
     private BidRepository bidRepository;
 
@@ -35,7 +35,6 @@ public class BidService implements BidInterface {
     }
 
     @Override
-    //place bid on auction
     public Bid placeBid(String auctionId, Bid bid) {
         Auction auction = auctionService.getAuctionById(auctionId);
 

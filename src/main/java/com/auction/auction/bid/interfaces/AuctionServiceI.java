@@ -6,12 +6,12 @@ import com.auction.auction.bid.model.Bid;
 import java.util.Date;
 import java.util.List;
 
-public interface AuctionInterface {
+public interface AuctionServiceI {
     Auction saveAuction(Auction auction);
     Auction getAuctionById(String id);
     List<Auction> getAllAuctions();
     void deleteAuctionById(String id);
-    List<Auction> getAuctionsByOwner(String owner);
+    List<Auction> getAuctionsByOwnerId(String ownerId);
     List<Auction> getAuctionsStartingAt(Date startDate);
     Auction placeBid(String auctionId, Bid bid);
     Auction createAuction(Auction auction);

@@ -1,7 +1,7 @@
 package com.auction.auction.bid.service;
 
 import com.auction.auction.bid.exception.AuctionNotFoundException;
-import com.auction.auction.bid.interfaces.AuctionInterface;
+import com.auction.auction.bid.interfaces.AuctionServiceI;
 import com.auction.auction.bid.kafka.KafkaProducerService;
 import com.auction.auction.bid.model.Auction;
 import com.auction.auction.bid.model.Bid;
@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class AuctionService implements AuctionInterface {
+public class AuctionService implements AuctionServiceI {
 
     @Autowired
     private AuctionRepository auctionRepository;
@@ -38,20 +38,14 @@ public class AuctionService implements AuctionInterface {
         // create a date range for the specific date and hour
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(specificDate);
-
-        // set the start of the hour (e.g., 2023-10-15 10:00:00)
         Date startOfHour = calendar.getTime();
-
-        // set the end of the hour (e.g., 2023-10-15 10:59:59)
         calendar.add(Calendar.HOUR_OF_DAY, 1);
         Date endOfHour = calendar.getTime();
 
-        // call the repository method to find auctions
         return auctionRepository.findAuctionsStartingAt(startOfHour, endOfHour);
     }
 
     @Override
-    // place bid on auction
     public Auction placeBid(String auctionId, Bid bid) {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
@@ -70,7 +64,6 @@ public class AuctionService implements AuctionInterface {
     }
 
     @Override
-    // close auction
     public void closeAuction(String auctionId) {
         Auction auction = getAuctionById(auctionId);
 
@@ -119,7 +112,7 @@ public class AuctionService implements AuctionInterface {
     }
 
     @Override
-    public List<Auction> getAuctionsByOwner(String owner) {
+    public List<Auction> getAuctionsByOwnerId(String owner) {
         return auctionRepository.findByOwner(owner);
     }
 
@@ -128,8 +121,5 @@ public class AuctionService implements AuctionInterface {
         return auctionRepository.findAll();
     }
 
-    // testing kafka producer
-//    public void sendMessage(String message) {
-//        this.kafkaProducerService.sendMessage("auctions", message);
-//    }
+
 }

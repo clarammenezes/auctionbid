@@ -1,8 +1,7 @@
 package com.auction.auction.bid.controller;
 
-import com.auction.auction.bid.interfaces.BidInterface;
+import com.auction.auction.bid.interfaces.BidIServiceI;
 import com.auction.auction.bid.model.Bid;
-import com.auction.auction.bid.service.BidService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class BidController {
 
     @Autowired
-    private BidInterface bidService;
+    private BidIServiceI bidService;
 
 
     @PostMapping("/{auctionId}/saveBid")

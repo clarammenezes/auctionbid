@@ -1,9 +1,8 @@
 package com.auction.auction.bid.controller;
 
 import com.auction.auction.bid.dto.UserDTO;
-import com.auction.auction.bid.interfaces.UserInterface;
+import com.auction.auction.bid.interfaces.UserServiceI;
 import com.auction.auction.bid.model.User;
-import com.auction.auction.bid.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,22 +15,22 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private UserInterface userService;
+    private UserServiceI userService;
 
 
-    @PostMapping("/users")
+    @PostMapping("/createUser")
     public ResponseEntity<User> createUser(@RequestBody @Valid UserDTO userDTO) {
         User response = userService.createUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User user) {
         User updatedUser = userService.updateUser(id, user);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
-    @PostMapping("/save")
+    @PostMapping
     public ResponseEntity<User> saveUser(@RequestBody User user) {
         User savedUser = userService.saveUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);

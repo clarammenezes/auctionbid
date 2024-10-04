@@ -1,6 +1,6 @@
 package com.auction.auction.bid.controller;
 
-import com.auction.auction.bid.interfaces.AuctionInterface;
+import com.auction.auction.bid.interfaces.AuctionServiceI;
 import com.auction.auction.bid.model.Auction;
 import com.auction.auction.bid.model.Bid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.List;
 public class AuctionController {
 
     @Autowired
-    private AuctionInterface auctionService;
+    private AuctionServiceI auctionService;
 
     @PostMapping
     public Auction createAuction(@RequestBody Auction auction) {
@@ -50,9 +50,9 @@ public class AuctionController {
     }
 
 
-    @GetMapping(value="auction/{owner}")
-    public List<Auction> getAuctionsByOwner(@PathVariable String owner) {
-        return auctionService.getAuctionsByOwner(owner);
+    @GetMapping(value="auction/{ownerId}")
+    public List<Auction> getAuctionsByOwnerId(@PathVariable String ownerId) {
+        return auctionService.getAuctionsByOwnerId(ownerId);
     }
 
     @DeleteMapping("/{id}")

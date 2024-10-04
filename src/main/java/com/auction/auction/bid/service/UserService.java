@@ -2,7 +2,7 @@ package com.auction.auction.bid.service;
 
 import com.auction.auction.bid.exception.EmailAlreadyInUseException;
 import com.auction.auction.bid.exception.UserNotFoundException;
-import com.auction.auction.bid.interfaces.UserInterface;
+import com.auction.auction.bid.interfaces.UserServiceI;
 import com.auction.auction.bid.model.User;
 import com.auction.auction.bid.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import com.auction.auction.bid.dto.UserDTO;
 import java.util.List;
 
 @Service
-public class UserService implements UserInterface {
+public class UserService implements UserServiceI {
 
     @Autowired
     private UserRepository userRepository;
@@ -55,12 +55,10 @@ public class UserService implements UserInterface {
 
     @Override
     public User updateUser(String id, User user) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User with id %s not found", id)));
+        User existingUser = getUserById(id);
         existingUser.setUsername(user.getUsername());
         existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
         existingUser.setEmail(user.getEmail());
-        // update other fields as necessary
         return userRepository.save(existingUser);
     }
 
