@@ -39,6 +39,13 @@ public class BidService implements BidIServiceI {
                 .max(Comparator.comparingDouble(Bid::getAmount))
                 .orElse(null);
 
+        if (currentHighestBid != null && bid.getAmount() > currentHighestBid.getAmount()) {
+            String outbidMessage = String.format("You have been outbid on auction %s. New highest bid is %.2f.",
+                    auction.getTitle(),
+                    bid.getAmount());
+            kafkaProducerService.sendMessage("user-notifications", outbidMessage);
+        }
+
         // validate the new bid against the current highest bid
         if (currentHighestBid != null && bid.getAmount() <= currentHighestBid.getAmount()) {
             throw new InvalidBidException("Bid amount must be greater than the current highest bid of: " + currentHighestBid.getAmount());
