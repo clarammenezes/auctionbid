@@ -27,13 +27,13 @@ public class Auction {
     private Date startDate;
     private Date endDate;
     private double bidAmount;
-    private AuctionStatus status; // Use the AuctionStatus enum here
+    private AuctionStatus status;
 
     @CreatedDate
-    private LocalDateTime createdDate; // Timestamp when the bid was created
+    private LocalDateTime createdDate;
 
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate; // Timestamp when the bid was last modified
+    private LocalDateTime lastModifiedDate;
 
     public Auction(String id, String title, String description, String owner, double startingBid, double currentBid, List<Bid> bids, Date startDate, Date endDate, double bidAmount) {
         this.id = id;
