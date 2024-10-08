@@ -14,14 +14,6 @@ public class BidController {
     @Autowired
     private BidIServiceI bidService;
 
-
-    @PostMapping("/{auctionId}/saveBid")
-    public ResponseEntity<Bid> saveBid(@PathVariable String auctionId, @RequestBody Bid bid) {
-        Bid savedBid = bidService.saveBid(auctionId, bid);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedBid);
-    }
-
-
     @PostMapping("/place/{auctionId}")
     public ResponseEntity<Bid> placeBid(@PathVariable String auctionId, @RequestBody Bid bid) {
         Bid placedBid = bidService.placeBid(auctionId, bid);

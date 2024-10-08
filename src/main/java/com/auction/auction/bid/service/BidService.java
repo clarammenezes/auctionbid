@@ -1,8 +1,10 @@
 package com.auction.auction.bid.service;
 
+import com.auction.auction.bid.exception.InvalidBidException;
 import com.auction.auction.bid.interfaces.BidIServiceI;
 import com.auction.auction.bid.kafka.KafkaProducerService;
 import com.auction.auction.bid.model.Auction;
+import com.auction.auction.bid.model.AuctionStatus;
 import com.auction.auction.bid.model.Bid;
 import com.auction.auction.bid.repository.BidRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import java.util.List;
 
 @Service
 public class BidService implements BidIServiceI {
+
     @Autowired
     private BidRepository bidRepository;
 
@@ -23,46 +26,35 @@ public class BidService implements BidIServiceI {
     private KafkaProducerService kafkaProducerService;
 
     @Override
-    public Bid saveBid(String auctionId, Bid bid) {
-        Auction auction = auctionService.getAuctionById(auctionId);
-
-        auction.getBids().add(bid);
-        auctionService.saveAuction(auction);
-
-        kafkaProducerService.sendMessage("bid-notifications", "New bid placed on auction: " + auction.getTitle());
-
-        return bidRepository.save(bid);
-    }
-
-    @Override
     public Bid placeBid(String auctionId, Bid bid) {
         Auction auction = auctionService.getAuctionById(auctionId);
 
-        // verification
-        List<Bid> bids = auction.getBids();
-        if (!bids.isEmpty()) {
-            Bid currentHighestBid = bids.stream()
-                    .max(Comparator.comparingDouble(Bid::getAmount))
-                    .orElse(null);
-            if (bid.getAmount() > currentHighestBid.getAmount()) {
-                // notify user of outbid
-                String outbidMessage = String.format("You have been outbid on auction %s. New highest bid is %.2f.",
-                        auction.getTitle(),
-                        bid.getAmount());
-                kafkaProducerService.sendMessage("user-notifications", outbidMessage);
-            }
+        if (auction.getStatus() != AuctionStatus.IN_PROCESS) {
+            throw new InvalidBidException("Cannot place a bid on an auction with status: " + auction.getStatus());
         }
 
-        // new bid to auction
+        // fetch all bids for the auction to determine the highest bid
+        List<Bid> bids = auction.getBids();
+        Bid currentHighestBid = bids.isEmpty() ? null : bids.stream()
+                .max(Comparator.comparingDouble(Bid::getAmount))
+                .orElse(null);
+
+        // validate the new bid against the current highest bid
+        if (currentHighestBid != null && bid.getAmount() <= currentHighestBid.getAmount()) {
+            throw new InvalidBidException("Bid amount must be greater than the current highest bid of: " + currentHighestBid.getAmount());
+        }
+
         auction.getBids().add(bid);
+
+        auction.setCurrentBid(bid.getAmount());
+
         auctionService.saveAuction(auction);
 
-        // new bid placed notification
         String newBidMessage = String.format("New bid placed on auction %s by %s: %.2f",
                 auction.getTitle(),
                 bid.getBidder(),
                 bid.getAmount());
-        kafkaProducerService.sendMessage("bid-notifications", newBidMessage);
+        kafkaProducerService.sendMessage("auction-notifications", newBidMessage);
 
         return bidRepository.save(bid);
     }
