@@ -2,9 +2,12 @@ package com.auction.auction.bid.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -23,8 +26,16 @@ public class Auction {
     private boolean isClosed;
     private Date startDate;
     private Date endDate;
+    private double bidAmount;
+    private AuctionStatus status;
 
-    public Auction(String id, String title, String description, String owner, double startingBid, double currentBid, List<Bid> bids, Date startDate, Date endDate) {
+    @CreatedDate
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
+
+    public Auction(String id, String title, String description, String owner, double startingBid, double currentBid, List<Bid> bids, Date startDate, Date endDate, double bidAmount) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -34,9 +45,12 @@ public class Auction {
         this.bids = bids;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.bidAmount = bidAmount;
+
     }
 
     public void setClosed(boolean closed) {
         isClosed = closed;
     }
+
 }

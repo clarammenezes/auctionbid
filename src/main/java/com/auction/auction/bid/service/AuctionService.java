@@ -1,9 +1,11 @@
 package com.auction.auction.bid.service;
 
 import com.auction.auction.bid.exception.AuctionNotFoundException;
+import com.auction.auction.bid.exception.InvalidAuctionOperationException;
 import com.auction.auction.bid.interfaces.AuctionServiceI;
 import com.auction.auction.bid.kafka.KafkaProducerService;
 import com.auction.auction.bid.model.Auction;
+import com.auction.auction.bid.model.AuctionStatus;
 import com.auction.auction.bid.model.Bid;
 import com.auction.auction.bid.repository.AuctionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +52,7 @@ public class AuctionService implements AuctionServiceI {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new AuctionNotFoundException(auctionId));
         if (bid.getAmount() > auction.getCurrentBid()) {
-            bidService.saveBid(auctionId,bid);
+            bidService.placeBid(auctionId,bid);
             auction.getBids().add(bid);
             auction.setCurrentBid(bid.getAmount());
             auctionRepository.save(auction);
@@ -88,22 +90,6 @@ public class AuctionService implements AuctionServiceI {
         auctionRepository.save(auction);
     }
 
-    @Override
-    public Auction saveAuction(Auction auction) {
-        Auction savedAuction = auctionRepository.save(auction);
-        kafkaProducerService.sendMessage("auction-notifications", "Auction saved: " + savedAuction.getTitle());
-        return savedAuction;
-    }
-
-    @Override
-    public void deleteAuctionById(String id) {
-        if (auctionRepository.existsById(id)) {
-            auctionRepository.deleteById(id);
-            kafkaProducerService.sendMessage("auction-notifications", "Auction deleted with id: " + id);
-        } else {
-            throw new AuctionNotFoundException(id);
-        }
-    }
 
     @Override
     public Auction getAuctionById(String id) {
@@ -119,6 +105,26 @@ public class AuctionService implements AuctionServiceI {
     @Override
     public List<Auction> getAllAuctions() {
         return auctionRepository.findAll();
+    }
+
+    @Override
+    public Auction saveAuction(Auction auction) {
+        if (auction.getStatus() == AuctionStatus.IN_PROCESS || auction.getStatus() == AuctionStatus.COMPLETED) {
+            throw new InvalidAuctionOperationException("Cannot modify an auction with status: " + auction.getStatus());
+        }
+        Auction savedAuction = auctionRepository.save(auction);
+        kafkaProducerService.sendMessage("auction-notifications", "Auction created or updated: " + savedAuction.getTitle());
+        return savedAuction;
+    }
+
+    @Override
+    public void deleteAuctionById(String id) {
+        Auction auction = getAuctionById(id);
+        if (auction.getStatus() == AuctionStatus.IN_PROCESS || auction.getStatus() == AuctionStatus.COMPLETED) {
+            throw new InvalidAuctionOperationException("Cannot delete an auction with status: " + auction.getStatus());
+        }
+        auctionRepository.deleteById(id);
+        kafkaProducerService.sendMessage("auction-notifications", "Auction deleted with id: " + id);
     }
 
 
