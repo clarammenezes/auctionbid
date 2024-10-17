@@ -15,6 +15,9 @@ public class Bid {
     private String bidder;
     private double amount;
 
+    public Bid() {
+    }
+
     public Bid(String id, String auctionId, String bidder, double amount) {
         this.id = id;
         this.auctionId = auctionId;

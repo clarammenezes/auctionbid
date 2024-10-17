@@ -35,6 +35,9 @@ public class Auction {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
+    public Auction() {
+    }
+
     public Auction(String id, String title, String description, String owner, double startingBid, double currentBid, List<Bid> bids, Date startDate, Date endDate, double bidAmount) {
         this.id = id;
         this.title = title;
