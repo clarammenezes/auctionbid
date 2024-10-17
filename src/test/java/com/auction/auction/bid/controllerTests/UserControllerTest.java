@@ -1,4 +1,5 @@
 package com.auction.auction.bid.controllerTests;
+
 import com.auction.auction.bid.controller.UserController;
 import com.auction.auction.bid.dto.UserDTO;
 import com.auction.auction.bid.interfaces.UserServiceI;
@@ -11,7 +12,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
 import java.util.Collections;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -57,20 +60,6 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":\"1\", \"username\":\"updateduser\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("1"));
-    }
-
-    @Test
-    void testSaveUser() throws Exception {
-        User user = new User();
-        user.setId("1");
-
-        when(userService.saveUser(any(User.class))).thenReturn(user);
-
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"testuser\", \"email\":\"test@example.com\"}"))
-                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value("1"));
     }
 

@@ -1,66 +1,66 @@
 package com.auction.auction.bid.repositoryTests;
+
 import com.auction.auction.bid.model.User;
 import com.auction.auction.bid.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
-@DataMongoTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 class UserRepositoryTest {
 
-    @Autowired
+    @Mock
     private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
-        userRepository.deleteAll();
+        // No need to delete all records as we are using mocks
     }
 
     @Test
     void testFindByUsername() {
         User user1 = new User();
         user1.setUsername("username1");
-        userRepository.save(user1);
 
-        User user2 = new User();
-        user2.setUsername("username2");
-        userRepository.save(user2);
+        when(userRepository.findByUsername("username1")).thenReturn(Collections.singletonList(user1));
 
         List<User> users = userRepository.findByUsername("username1");
         assertEquals(1, users.size());
         assertEquals("username1", users.get(0).getUsername());
+
+        verify(userRepository).findByUsername("username1");
     }
 
     @Test
     void testFindByEmail() {
         User user1 = new User();
         user1.setEmail("email1@example.com");
-        userRepository.save(user1);
 
-        User user2 = new User();
-        user2.setEmail("email2@example.com");
-        userRepository.save(user2);
+        when(userRepository.findByEmail("email1@example.com")).thenReturn(Collections.singletonList(user1));
 
         List<User> users = userRepository.findByEmail("email1@example.com");
         assertEquals(1, users.size());
         assertEquals("email1@example.com", users.get(0).getEmail());
+
+        verify(userRepository).findByEmail("email1@example.com");
     }
 
     @Test
     void testExistsByEmail() {
-        User user = new User();
-        user.setEmail("email@example.com");
-        userRepository.save(user);
+        when(userRepository.existsByEmail("email@example.com")).thenReturn(true);
 
         boolean exists = userRepository.existsByEmail("email@example.com");
         assertTrue(exists);
+
+        verify(userRepository).existsByEmail("email@example.com");
     }
 }

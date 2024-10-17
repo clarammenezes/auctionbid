@@ -1,6 +1,6 @@
 package com.auction.auction.bid.controller;
 
-import com.auction.auction.bid.interfaces.BidIServiceI;
+import com.auction.auction.bid.interfaces.BidServiceI;
 import com.auction.auction.bid.model.Bid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class BidController {
 
     @Autowired
-    private BidIServiceI bidService;
+    private BidServiceI bidService;
 
     @PostMapping("/place/{auctionId}")
     public ResponseEntity<Bid> placeBid(@PathVariable String auctionId, @RequestBody Bid bid) {
