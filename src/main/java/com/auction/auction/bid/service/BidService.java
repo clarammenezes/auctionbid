@@ -1,7 +1,7 @@
 package com.auction.auction.bid.service;
 
 import com.auction.auction.bid.exception.InvalidBidException;
-import com.auction.auction.bid.interfaces.BidIServiceI;
+import com.auction.auction.bid.interfaces.BidServiceI;
 import com.auction.auction.bid.kafka.KafkaProducerService;
 import com.auction.auction.bid.model.Auction;
 import com.auction.auction.bid.model.AuctionStatus;
@@ -14,7 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class BidService implements BidIServiceI {
+public class BidService implements BidServiceI {
 
     @Autowired
     private BidRepository bidRepository;
