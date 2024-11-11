@@ -8,6 +8,7 @@ import com.auction.auction.bid.model.AuctionStatus;
 import com.auction.auction.bid.model.Bid;
 import com.auction.auction.bid.repository.BidRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -16,14 +17,16 @@ import java.util.List;
 @Service
 public class BidService implements BidServiceI {
 
-    @Autowired
-    private BidRepository bidRepository;
+    private final BidRepository bidRepository;
+    private final AuctionService auctionService;
+    private final KafkaProducerService kafkaProducerService;
 
     @Autowired
-    private AuctionService auctionService;
-
-    @Autowired
-    private KafkaProducerService kafkaProducerService;
+    public BidService(BidRepository bidRepository, @Lazy AuctionService auctionService, KafkaProducerService kafkaProducerService) {
+        this.bidRepository = bidRepository;
+        this.auctionService = auctionService;
+        this.kafkaProducerService = kafkaProducerService;
+    }
 
     @Override
     public Bid placeBid(String auctionId, Bid bid) {

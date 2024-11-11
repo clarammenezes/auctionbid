@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auctionplatform-deployment
+  namespace: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auctionplatform
+  template:
+    metadata:
+      labels:
+        app: auctionplatform
+    spec:
+      containers:
+        - name: auctionplatform
+          image: auctionbid:7
+          env:
+            - name: SPRING_DATA_MONGODB_URI
+              value: "mongodb+srv://clarammenezes:X57hTlYEA2lFhIul@general-cluster.rfftb.mongodb.net/auctiondb"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-service.dev.svc.cluster.local:9092"
+          ports:
+            - containerPort: 8080
+            - containerPort: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auctionplatform-service
+  namespace: dev
+spec:
+  type: NodePort
+  selector:
+    app: auctionplatform
+  ports:
+    - port: 8080
+      name: http
+      targetPort: 8080
+      nodePort: 30008  # NodePort for external access (choose a port in range 30000-32767)
+    - port: 27017
+      name: mongodb
+      targetPort: 27017
+      nodePort: 30009  # NodePort for MongoDB access if needed
