@@ -4,6 +4,7 @@ import com.auction.auction.bid.interfaces.AuctionServiceI;
 import com.auction.auction.bid.model.Auction;
 import com.auction.auction.bid.model.Bid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +15,15 @@ import java.util.List;
 @RequestMapping("/auctions")
 public class AuctionController {
 
-    @Autowired
-    private AuctionServiceI auctionService;
 
-    @PostMapping
+    private final AuctionServiceI auctionService;
+
+    @Autowired
+    public AuctionController(@Lazy AuctionServiceI auctionService) {
+        this.auctionService = auctionService;
+    }
+
+    @PostMapping("/create")
     public Auction createAuction(@RequestBody Auction auction) {
         return auctionService.createAuction(auction);
     }
@@ -33,7 +39,7 @@ public class AuctionController {
         return auctionService.getAuctionsStartingAt(date);
     }
 
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<String> saveAuction(@RequestBody Auction auction) {
         auctionService.saveAuction(auction);
         return ResponseEntity.ok("Auction saved successfully");

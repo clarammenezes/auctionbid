@@ -9,6 +9,7 @@ import com.auction.auction.bid.model.AuctionStatus;
 import com.auction.auction.bid.model.Bid;
 import com.auction.auction.bid.repository.AuctionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -19,14 +20,16 @@ import java.util.List;
 @Service
 public class AuctionService implements AuctionServiceI {
 
-    @Autowired
-    private AuctionRepository auctionRepository;
+    private final AuctionRepository auctionRepository;
+    private final KafkaProducerService kafkaProducerService;
+    private final BidService bidService;
 
     @Autowired
-    private KafkaProducerService kafkaProducerService;
-
-    @Autowired
-    private BidService bidService;
+    public AuctionService(AuctionRepository auctionRepository, KafkaProducerService kafkaProducerService, @Lazy BidService bidService) {
+        this.auctionRepository = auctionRepository;
+        this.kafkaProducerService = kafkaProducerService;
+        this.bidService = bidService;
+    }
 
     @Override
     public Auction createAuction(Auction auction) {
